@@ -88,6 +88,7 @@ console.error("Error:", error);
         const cookies = new Cookies();
 
         cookies.set("pk_json", JSON.stringify(encryptedJson))
+        cookies.set("mobileNumber",mobileNumber)
         // api call
     
         const queryParams = new URLSearchParams({
