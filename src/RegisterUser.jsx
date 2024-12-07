@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Web3 from "web3";
 import Cookies from 'universal-cookie';
 import { BASE_URL, SMS_SUCCESS } from "./constants";
+import { useNavigate } from "react-router-dom";
 
 const RegisterUser = ()=>{
 
@@ -15,6 +16,7 @@ const RegisterUser = ()=>{
       setMobileNumber(e.target.value);
     };
 
+    const navigate = useNavigate();
     const handlePrivateKeyChange = (e) => {
         setPrivateKey(e.target.value);
       };
@@ -70,6 +72,8 @@ console.error("Error:", error);
     const handleSubmit = async () => {
         // setOTP()
         //API
+
+
         console.log(`Mobile Number: ${mobileNumber}`);
         console.log("private e=key ", privateKey);
         console.log("password  ", password);  
@@ -90,12 +94,13 @@ console.error("Error:", error);
             mobile_no: mobileNumber,
             pk_json: JSON.stringify(encryptedJson),
             public_key: encryptedJson.address,
+            sms_session_id:SMSSessionID,
             otp,
           }).toString();
-
+          let registerUserAPIResponse;
     try {
         const response = await fetch(
-          `http://104.198.221.136:8080/register?${queryParams}`,
+          `${BASE_URL}/register?${queryParams}`,
           {
             method: "POST",
             headers: {
@@ -106,18 +111,19 @@ console.error("Error:", error);
         );
   
         if (response.ok) {
-          const data = await response.json();
+          registerUserAPIResponse = await response.json();
           cookies.set("pk_json", encryptedJson)
-          console.log("Success:", data);
-          alert("Form submitted successfully!");
+          console.log("Success:", registerUserAPIResponse);
         } else {
           console.error("Error:", response.statusText);
-          alert("Failed to submit form.");
         }
       } catch (error) {
         console.error("Error:", error);
-        alert("An error occurred while submitting the form.");
       }
+      if(registerUserAPIResponse.success){
+        navigate('/');
+      }
+      else{console.log("Registeration of User failed")}
     };
     return(
         <div className="App-header" style={{  alignItems: "center", gap: "10px", display:"grid" }}>

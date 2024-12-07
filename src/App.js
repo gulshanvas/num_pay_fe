@@ -8,8 +8,14 @@ import LoginScreen from './LoginScreen.jsx';
 import { BrowserRouter, Route,Routes } from 'react-router-dom';
 
 function App() {
-  return (
+  return (<>
     <BrowserRouter>
+
+    <h2 style={{color:"blueviolet",  position: "relative",
+ 
+  display: "flex",
+  justifyContent: "center",
+  alignItems:"flex-start"}}>ETHIndia2024</h2>
 <Routes>
   
 <Route path="/" element={< LoginScreen/>} />
@@ -18,6 +24,7 @@ function App() {
 <Route path="/transfer-page" element={<TransferPage />} /></Routes>
 
     </BrowserRouter>
+    </>
   );
 }
 
