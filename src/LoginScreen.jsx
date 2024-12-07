@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from "./constants";
+import { BASE_URL, SMS_SUCCESS } from "./constants";
 
 
 const LoginScreen = () => {
@@ -9,13 +9,60 @@ const LoginScreen = () => {
 const[otp,setOTP]=useState()
 const navigate = useNavigate();
 
+const [SMSSessionID,setSMSSessionID]= useState();
   const handleMobileNumberChange = (e) => {
     setMobileNumber(e.target.value);
   };
+  const handleOTPChange=(e)=>{
+    setOTP(e.target.value);
+  }
 
-  const handleOTP=(e)=>{
-    console.log('e.target.value ',e.target.value)
-    setOTP(e.target.value)
+const handleLogin=async(e)=>{
+console.log('handle login ',e.target.value)
+console.log("This is OTPPP    ",otp)
+}
+
+  const handleOTP=async(e)=>{
+    console.log('handle OTP after final submit ',e.target.value)
+   
+console.log(" Mobile Number   ",mobileNumber)
+
+console.log(" Session ID  ",SMSSessionID)
+
+console.log("This is OTP  ",otp)
+    const queryParams = new URLSearchParams({
+      mobile_no: mobileNumber,
+      sms_session_id:SMSSessionID,
+      otp,
+      
+    }).toString();
+   let loginAPIResponse;
+  try {
+  const response = await fetch(
+    `${BASE_URL}/login?${queryParams}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}), // Add body content if needed, or leave empty
+    }
+  );
+  if (response.ok) {
+    loginAPIResponse = await response.json();
+   console.log("Login API Response   ", loginAPIResponse)
+   if(loginAPIResponse.success){
+    
+    navigate('/transfer-page')}
+ } else {
+   console.error("Error:", response.statusText);
+   alert("Failed to submit form.");
+ }
+ } catch (error) {
+ console.error("Error:", error);
+ }
+
+  
     // console.log(`OTP: ${otp}`)
 }
   
@@ -46,7 +93,42 @@ let APIResponse ;
       }
     // console.log(mobileNumber);
     
-    if(APIResponse.success ){navigate('/transfer-page')}
+    if(APIResponse.success ){
+
+      const queryParams = new URLSearchParams({
+        mobile_no: mobileNumber,
+        
+      }).toString();
+     let generateOTPAPIResponse;
+    try {
+    const response = await fetch(
+      `${BASE_URL}/generate-otp?${queryParams}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}), // Add body content if needed, or leave empty
+      }
+    );
+    
+    if (response.ok) {
+       generateOTPAPIResponse = await response.json();
+       if(generateOTPAPIResponse.data.Status == SMS_SUCCESS){
+       setSMSSessionID(generateOTPAPIResponse.data.Details);
+       }
+       console.log("+++++++++Generated OTP+++++++  ",generateOTPAPIResponse)
+    
+    } else {
+      console.error("Error:", response.statusText);
+      alert("Failed to submit form.");
+    }
+    } catch (error) {
+    console.error("Error:", error);
+    }
+
+
+    }
     else {navigate('/register-page')};
 
     alert(`Mobile Number: ${mobileNumber}`);
@@ -65,7 +147,7 @@ let APIResponse ;
         style={{ padding: "8px", fontSize: "14px" }}
       />
 <button
-        onClick={handleOTP}
+        onClick={handleSubmit}
         style={{
           padding: "10px 20px",
           backgroundColor: "#007BFF",
@@ -83,11 +165,11 @@ let APIResponse ;
         value={otp}
         placeholder="Enter OTP"
 
-        onChange={handleOTP}
+        onChange={handleOTPChange}
         style={{ padding: "8px", fontSize: "14px" }}
       />
 <button
-        onClick={handleSubmit}
+        onClick={handleOTP}
         style={{
           padding: "10px 20px",
           backgroundColor: "#007BFF",
@@ -95,6 +177,7 @@ let APIResponse ;
           border: "none",
           borderRadius: "4px",
           cursor: "pointer",
+          
         }}
       >
         Submit
@@ -108,3 +191,13 @@ let APIResponse ;
 };
 
 export default LoginScreen;
+//Response
+/*{
+  "success": true,
+  "data": {
+      "id": 1,
+      "phoneNo": "+917021093375",
+      "publicKey": "1adf40848a017ca89560872292b4b71faeb8a2e5",
+      "pkJSON": "{\"version\":3,\"id\":\"39480105-e1a9-4056-9bef-d0918c664b86\",\"address\":\"1adf40848a017ca89560872292b4b71faeb8a2e5\",\"crypto\":{\"ciphertext\":\"8cecfd9c63d5181ebb88fa392e419cd37b497843d0e6781f4a84698b520875c6\",\"cipherparams\":{\"iv\":\"773fcd04e649d33c677e5825d71add22\"},\"cipher\":\"aes-128-ctr\",\"kdf\":\"scrypt\",\"kdfparams\":{\"n\":8192,\"r\":8,\"p\":1,\"dklen\":32,\"salt\":\"3d9bf8f0ca4bbeb7b059fa3d2fa0e805b88e97e3bd78161c8139d6430660b9f5\"},\"mac\":\"65835e71645fd291ffa3b134765730945b8563c4462db3de0e80be6631b6b10b\"}}"
+  }
+}*/
