@@ -127,6 +127,21 @@ console.error("Error:", error);
       else{console.log("Registeration of User failed")}
     };
     return(
+      <div style={{display: "flex",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f4f4f4", /* Optional: Background color for contrast */
+      }}>
+    <div className="App-header" style ={{ 
+      width: "50%",
+      backgroundColor: "blueviolet",
+      color: "white",
+      fontSize: "24px",
+      fontWeight: "bold",
+      borderRadius: "40%",
+    }}>
+      <h2 > Register Page</h2>
         <div className="App-header" style={{  alignItems: "center", gap: "10px", display:"grid" }}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>
@@ -196,6 +211,8 @@ console.error("Error:", error);
 
 
   
+    </div>
+    </div>
     </div>
 
     )

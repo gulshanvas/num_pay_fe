@@ -6,7 +6,8 @@ import { eip7702Actions } from 'viem/experimental';
 import { createPublicClient, createWalletClient, encodeFunctionData, http, parseEther } from 'viem';
 import { privateKeyToAccount } from "viem/accounts";
 import { BASE_URL } from "./constants";
-
+// eslint-disable-next-line no-undef
+BigInt.prototype.toJSON = function () { return this.toString() }
 
 const batchCallAbi = [
     {
@@ -447,12 +448,56 @@ let APIResponse;
  
 
   const authorization = await walletClient.signAuthorization({ contractAddress, delegate: "0xbA1c4e29714F4618215441BC3e9629054857b529" });//TO DO=> Delegate address
-
+console.log("This is authorization list ",authorization)
   const tokenContract = "0xb9A3C6197b864B8d49Ef86894249B952Cbae1e34" //TO DO=> Token contract
   const receiverHexAddress = "0x"+receiverPublicKey;
   console.log("This is extracted address   ",receiverHexAddress)
   const transferTxEncodedData = encodeFunctionData({ address: tokenContract, abi, functionName: "transfer", args: [receiverHexAddress, parsedAmount] })//TO DO=> Receiver address, transfer amount
+  const txData = encodeFunctionData({
+    abi: batchCallAbi,
+    functionName: 'execute',
+    args: [
+      [
+        {
+          data: transferTxEncodedData,
+          to: tokenContract,
+          value: "0",
+        },
+      ],
+    ]
+  })
+
+  const queryParams = new URLSearchParams({
+    authorization_list: JSON.stringify(authorization),
+    encoded_data: txData,
+    
+    to: walletClient.account.address,
+   
+  }).toString();
+  let transferAPIResponse;
+try {
+const response = await fetch(
+  `${BASE_URL}/transfer?${queryParams}`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}), // Add body content if needed, or leave empty
+  }
+);
+
+if (response.ok) {
+  transferAPIResponse = await response.json();
+  console.log("Success:", transferAPIResponse);
+} else {
+  console.error("Error:", response.statusText);
+}
+} catch (error) {
+console.error("Error:", error);
+}
   
+  /*
   const transactionPrepared = await walletClient.prepareTransactionRequest({
     // value: "12000000000000000000",
     // account: delegateAccount,
@@ -491,7 +536,7 @@ let APIResponse;
   const signedTransactionPrepared = await walletClient.signTransaction(transactionPrepared);
 
   console.log("This signed transaction prepared",JSON.stringify(signedTransactionPrepared));
- /*
+
 
   //Backend Call
 
