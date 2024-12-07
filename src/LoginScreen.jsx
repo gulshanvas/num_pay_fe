@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL, SMS_SUCCESS } from "./constants";
 
@@ -24,7 +25,8 @@ console.log("This is OTPPP    ",otp)
 
   const handleOTP=async(e)=>{
     console.log('handle OTP after final submit ',e.target.value)
-   
+    const cookies = new Cookies();
+    cookies.set("mobileNumber",mobileNumber)
 console.log(" Mobile Number   ",mobileNumber)
 
 console.log(" Session ID  ",SMSSessionID)
@@ -68,7 +70,7 @@ console.log("This is OTP  ",otp)
   
   const handleSubmit = async() => {
     //API
-let APIResponse ;
+  let APIResponse ;
     try {
         const response = await fetch(
           `${BASE_URL}/mobile/${mobileNumber}`,
@@ -134,9 +136,27 @@ let APIResponse ;
     alert(`Mobile Number: ${mobileNumber}`);
   };
 
-  return (<div className="App-header">
+  return (
+  <div style={{display: "flex",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f4f4", /* Optional: Background color for contrast */
+  }}>
+  <div className="App-header" style ={{ 
+    width: "50%",
+    backgroundColor: "blueviolet",
+    color: "white",
+    fontSize: "24px",
+    fontWeight: "bold",
+    borderRadius: "40%",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  
+    }}>
     <h3> Login Screen</h3>
-    <div style={{ display: "grid", alignItems: "center", gap: "5px" }}>
+    <div style={{ display: "grid", alignItems: "center", gap: "5px"}}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>
       <input
@@ -149,15 +169,18 @@ let APIResponse ;
 <button
         onClick={handleSubmit}
         style={{
-          padding: "10px 20px",
-          backgroundColor: "#007BFF",
-          color: "#fff",
+          padding: "9px 17px",
+          backgroundColor: "orange",
+          color: "white",
+    fontWeight: "bold",
+
+    fontSize: "17px",
           border: "none",
           borderRadius: "4px",
           cursor: "pointer",
         }}
       >
-        Submit
+        Generate OTP
       </button>
 <p>Enter OTP:</p>
       <input
@@ -171,9 +194,12 @@ let APIResponse ;
 <button
         onClick={handleOTP}
         style={{
-          padding: "10px 20px",
-          backgroundColor: "#007BFF",
-          color: "#fff",
+          padding: "9px 17px",
+          backgroundColor: "orange",
+          color: "white",
+          fontWeight: "bold",
+
+          fontSize: "17px",
           border: "none",
           borderRadius: "4px",
           cursor: "pointer",
@@ -183,6 +209,7 @@ let APIResponse ;
         Submit
       </button>
   
+    </div>
     </div>
     </div>
   );
