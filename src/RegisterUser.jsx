@@ -141,7 +141,6 @@ console.error("Error:", error);
       fontWeight: "bold",
       borderRadius: "40%",
     }}>
-      <h2 > Register Page</h2>
         <div className="App-header" style={{  alignItems: "center", gap: "10px", display:"grid" }}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>

@@ -470,7 +470,7 @@ console.log("This is authorization list ",authorization)
   const queryParams = new URLSearchParams({
     authorization_list: JSON.stringify(authorization),
     encoded_data: txData,
-    
+
     to: walletClient.account.address,
    
   }).toString();
@@ -594,7 +594,6 @@ alert("An error occurred while submitting the form.");
     fontWeight: "bold",
     borderRadius: "40%",
   }}>
-    <h2 > Transfer Page</h2>
     <div style={{ display: "grid", alignItems: "center", gap: "10px" }}>
        
       {/* Mobile Number Input */}

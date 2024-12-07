@@ -155,7 +155,6 @@ console.log("This is OTP  ",otp)
     textAlign: "center",
   
     }}>
-    <h3> Login Screen</h3>
     <div style={{ display: "grid", alignItems: "center", gap: "5px"}}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>
