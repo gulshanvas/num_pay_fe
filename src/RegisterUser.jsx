@@ -163,7 +163,7 @@ console.error("Error:", error);
       {/* Private key */}
       <p>Enter private key:</p>
       <input
-        type="text"
+        type="password"
         placeholder="Enter private key"
         value={privateKey}
         onChange={handlePrivateKeyChange}
@@ -173,7 +173,7 @@ console.error("Error:", error);
        {/* Private key */}
        <p>Set password</p>
       <input
-        type="text"
+        type="password"
         placeholder="Set password"
         value={password}
         onChange={handlePassword}

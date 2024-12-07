@@ -185,10 +185,9 @@ console.log("This is OTP  ",otp)
       {message && (
             <p
               style={{
-                color: message.includes("Successfully")
-                  ? "red"
-                  : "red",
-                marginTop: "3px",fontSize:"13px"
+                color:"white"
+                  ,
+                marginTop: "3px",fontSize:"15px"
               }}
             >
               {message}
@@ -211,7 +210,6 @@ console.log("This is OTP  ",otp)
           backgroundColor: "orange",
           color: "white",
           fontWeight: "bold",
-
           fontSize: "17px",
           border: "none",
           borderRadius: "4px",

@@ -533,7 +533,22 @@ alert("An error occurred while submitting the form.");
   const handleAmountChange=(e)=>{
     setAmount(e.target.value);
   }
-  return (<div className="App-header">
+  return (
+  
+    <div style={{display: "flex",
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#f4f4f4", /* Optional: Background color for contrast */
+    }}>
+  <div className="App-header" style ={{ 
+    width: "50%",
+    backgroundColor: "blueviolet",
+    color: "white",
+    fontSize: "24px",
+    fontWeight: "bold",
+    borderRadius: "40%",
+  }}>
     <h2 > Transfer Page</h2>
     <div style={{ display: "grid", alignItems: "center", gap: "10px" }}>
        
@@ -547,7 +562,7 @@ alert("An error occurred while submitting the form.");
         style={{ padding: "8px", fontSize: "14px" }}
       />
 
-<p>Enter the amount you want to transfer</p>
+<p>Enter the amount you want to transfer:</p>
       <input
         type="tel"
         placeholder="Amount "
@@ -555,9 +570,9 @@ alert("An error occurred while submitting the form.");
         onChange={handleAmountChange}
         style={{ padding: "8px", fontSize: "14px" }}
       />
-   <p>Set password</p>
+   <p>Set password:</p>
       <input
-        type="text"
+        type="password"
         placeholder="Set password"
         value={password}
         onChange={handlePassword}
@@ -567,10 +582,12 @@ alert("An error occurred while submitting the form.");
 <button
         onClick={handleSubmit}
         style={{
-          padding: "10px 20px",
-          backgroundColor: "#007BFF",
-          color: "#fff",
+          padding: "9px 17px",
+          backgroundColor: "orange",
+          color: "white",
           border: "none",
+          fontWeight: "bold",
+          fontSize: "17px",
           borderRadius: "4px",
           cursor: "pointer",
         }}
@@ -578,6 +595,7 @@ alert("An error occurred while submitting the form.");
         Submit
       </button>
   
+    </div>
     </div>
     </div>
   );
