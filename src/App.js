@@ -15,7 +15,7 @@ function App() {
  
   display: "flex",
   justifyContent: "center",
-  alignItems:"flex-start"}}>ETHIndia2024</h2>
+  alignItems:"flex-start"}}>NUMPAY</h2>
 <Routes>
   
 <Route path="/" element={< LoginScreen/>} />
