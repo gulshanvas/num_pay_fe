@@ -9,7 +9,7 @@ const LoginScreen = () => {
   const [mobileNumber, setMobileNumber] = useState("");
 const[otp,setOTP]=useState()
 const navigate = useNavigate();
-
+const [message, setMessage] = useState(""); 
 const [SMSSessionID,setSMSSessionID]= useState();
   const handleMobileNumberChange = (e) => {
     setMobileNumber(e.target.value);
@@ -118,7 +118,8 @@ console.log("This is OTP  ",otp)
        generateOTPAPIResponse = await response.json();
        if(generateOTPAPIResponse.data.Status == SMS_SUCCESS){
        setSMSSessionID(generateOTPAPIResponse.data.Details);
-       }
+       setMessage("OTP Sent Successfully!"); 
+      }
        console.log("+++++++++Generated OTP+++++++  ",generateOTPAPIResponse)
     
     } else {
@@ -133,7 +134,6 @@ console.log("This is OTP  ",otp)
     }
     else {navigate('/register-page')};
 
-    alert(`Mobile Number: ${mobileNumber}`);
   };
 
   return (
@@ -182,6 +182,19 @@ console.log("This is OTP  ",otp)
       >
         Generate OTP
       </button>
+      {message && (
+            <p
+              style={{
+                color: message.includes("Successfully")
+                  ? "red"
+                  : "red",
+                marginTop: "3px",fontSize:"13px"
+              }}
+            >
+              {message}
+            </p>
+          )}
+
 <p>Enter OTP:</p>
       <input
         type="tel"
