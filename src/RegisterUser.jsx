@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import Web3 from "web3";
 import Cookies from 'universal-cookie';
+import { BASE_URL, SMS_SUCCESS } from "./constants";
 
 const RegisterUser = ()=>{
 
     const [mobileNumber, setMobileNumber] = useState();
     const [privateKey,setPrivateKey] = useState();
     const [otp,setOTP]= useState();
+    const [checkOTP,setCheckOTP] =useState();
     const [password,setPassword] = useState();
+    const [SMSSessionID,setSMSSessionID]= useState();
     const handleMobileNumberChange = (e) => {
       setMobileNumber(e.target.value);
     };
@@ -24,6 +27,45 @@ const handleOTP=(e)=>{
     console.log('e.target.value ',e.target.value)
     setOTP(e.target.value)
     // console.log(`OTP: ${otp}`)
+}
+ const handleSendOTP=async(e)=>{
+    setCheckOTP(e.target.value);
+     console.log("This is mobile number",mobileNumber);
+
+//API
+const queryParams = new URLSearchParams({
+    mobile_no: mobileNumber,
+   
+  }).toString();
+ let generateOTPAPIResponse;
+try {
+const response = await fetch(
+  `${BASE_URL}/generate-otp?${queryParams}`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}), // Add body content if needed, or leave empty
+  }
+);
+
+if (response.ok) {
+   generateOTPAPIResponse = await response.json();
+   if(generateOTPAPIResponse.data.Status == SMS_SUCCESS){
+   setSMSSessionID(generateOTPAPIResponse.data.Details);
+   }
+   console.log("+++++++++Generated OTP+++++++  ",generateOTPAPIResponse)
+
+} else {
+  console.error("Error:", response.statusText);
+  alert("Failed to submit form.");
+}
+} catch (error) {
+console.error("Error:", error);
+}
+
+
 }
     const handleSubmit = async () => {
         // setOTP()
@@ -78,8 +120,7 @@ const handleOTP=(e)=>{
       }
     };
     return(
-
-        <div style={{  alignItems: "center", gap: "10px", display:"grid" }}>
+        <div className="App-header" style={{  alignItems: "center", gap: "10px", display:"grid" }}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>
       <input
@@ -91,7 +132,7 @@ const handleOTP=(e)=>{
       />
 
 <button
-        // onClick={handleOTP}
+        onClick={handleSendOTP}
         style={{
           padding: "10px 20px",
           backgroundColor: "#007BFF",

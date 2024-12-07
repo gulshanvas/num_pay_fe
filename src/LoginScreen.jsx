@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from "./constants";
 
 
 const LoginScreen = () => {
@@ -18,17 +19,34 @@ const navigate = useNavigate();
     // console.log(`OTP: ${otp}`)
 }
   
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     //API
-    // console.log(mobileNumber);
-    const response ={
+let APIResponse ;
+    try {
+        const response = await fetch(
+          `${BASE_URL}/mobile/${mobileNumber}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+           // body: JSON.stringify({}), // Add body content if needed, or leave empty
+          }
+        );
+  
+        if (response.ok) {
+          APIResponse = await response.json();
+          console.log("This is data ",APIResponse)
+        } else {
+          console.error("Error:", response.statusText);
         
-    "success": true,
-    "message": "not present"
-          
-    }
-
-    if(response.success ){navigate('/transfer-page')}
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    // console.log(mobileNumber);
+    
+    if(APIResponse.success ){navigate('/transfer-page')}
     else {navigate('/register-page')};
 
     alert(`Mobile Number: ${mobileNumber}`);
@@ -47,7 +65,7 @@ const navigate = useNavigate();
         style={{ padding: "8px", fontSize: "14px" }}
       />
 <button
-        // onClick={handleOTP}
+        onClick={handleOTP}
         style={{
           padding: "10px 20px",
           backgroundColor: "#007BFF",
@@ -57,7 +75,7 @@ const navigate = useNavigate();
           cursor: "pointer",
         }}
       >
-        Send OTP
+        Submit
       </button>
 <p>Enter OTP:</p>
       <input
