@@ -5,6 +5,7 @@ import { odysseyTestnet } from 'viem/chains';
 import { eip7702Actions } from 'viem/experimental';
 import { createPublicClient, createWalletClient, encodeFunctionData, http, parseEther } from 'viem';
 import { privateKeyToAccount } from "viem/accounts";
+import { BASE_URL } from "./constants";
 
 
 const batchCallAbi = [
@@ -329,30 +330,104 @@ const batchCallAbi = [
 const contractAddress = "0x654F42b74885EE6803F403f077bc0409f1066c58"
 
 const TransferPage = () => {
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [receiverMobileNumber, setReceiverMobileNumber] = useState("");
 const [amount,setAmount] = useState();
+const [password,setPassword] = useState();
 
-  const handleMobileNumberChange = (e) => {
-    setMobileNumber(e.target.value);
-    console.log(mobileNumber);
+const handlePassword=(e) =>{
+  setPassword(e.target.value);
+}
+
+  const handleReceiverMobileNumberChange = (e) => {
+    setReceiverMobileNumber(e.target.value);
+    console.log(receiverMobileNumber);
   };
    
-
+const handleDummySubmit = async()=>{
+  console.log("This is receiver mobile number    ",receiverMobileNumber)
+}
 
   const handleSubmit = async() => {
     //API
+
+    console.log("This is the password  ",password);
+    console.log("This is the amount  ",amount);
+    const parsedAmount = parseEther(amount);
+
+    console.log("This is receiver mobile number    ",receiverMobileNumber)
+let APIResponse;
+let receiverPublicKey;
+    try {
+      const response = await fetch(
+        `${BASE_URL}/receiver-mobile/${receiverMobileNumber}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+         // body: JSON.stringify({}), // Add body content if needed, or leave empty
+        }
+      );
+
+      if (response.ok) {
+        APIResponse = await response.json();
+        console.log("This is api response ",APIResponse)
+          receiverPublicKey = APIResponse.data.publicKey;
+        if(APIResponse.data){console.log("user existed")}else{console.log("User doesnt exist")}
+      } else {
+        console.error("Error:", response.statusText);
+      
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      
+    }
+
+    //END
+
     //Receivers mobile number => call API to fetch public key
     //Ask User's password
     //
-    console.log("This is number ===> ", mobileNumber);
+    
+    console.log("This is number ===> ", receiverMobileNumber);
     // console.log(mobileNumber);
     console.log(amount);
     const cookies = new Cookies();
-    const pk_json =cookies.get("pk_json");
+    let pk_json =cookies.get("pk_json");
+    const mobile_number= cookies.get("mobileNumber")
     console.log("This is pk_json",pk_json)
+    if(!pk_json){
+let APIResponse;
+      try {
+        const response = await fetch(
+          `${BASE_URL}/mobile/${mobile_number}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+           // body: JSON.stringify({}), // Add body content if needed, or leave empty
+          }
+        );
+  
+        if (response.ok) {
+          APIResponse = await response.json();
+          console.log("This is data ",APIResponse)
+          pk_json =JSON.parse(APIResponse.data.pkJSON)
+
+          console.log("This is pkjson  ",pk_json)
+        } else {
+          console.error("Error:", response.statusText);
+        
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+    }
 
     const web3 = new Web3()
-    const retrievedObject = await web3.eth.accounts.decrypt(pk_json,'1234');// TO DO => accept password from user
+    const retrievedObject = await web3.eth.accounts.decrypt(pk_json,password);// TO DO => accept password from user
    const privateKey=retrievedObject.privateKey;
    console.log("Thsi is private key",privateKey);
    const walletClientCreator = privateKeyToAccount(privateKey);
@@ -374,7 +449,9 @@ const [amount,setAmount] = useState();
   const authorization = await walletClient.signAuthorization({ contractAddress, delegate: "0xbA1c4e29714F4618215441BC3e9629054857b529" });//TO DO=> Delegate address
 
   const tokenContract = "0xb9A3C6197b864B8d49Ef86894249B952Cbae1e34" //TO DO=> Token contract
-  const transferTxEncodedData = encodeFunctionData({ address: tokenContract, abi, functionName: "transfer", args: ["0xD593EE741824fD627a9a888294547a5CA5AbF8fB", parseEther("0.001")] })//TO DO=> Receiver address, transfer amount
+  const receiverHexAddress = "0x"+receiverPublicKey;
+  console.log("This is extracted address   ",receiverHexAddress)
+  const transferTxEncodedData = encodeFunctionData({ address: tokenContract, abi, functionName: "transfer", args: [receiverHexAddress, parsedAmount] })//TO DO=> Receiver address, transfer amount
   
   const transactionPrepared = await walletClient.prepareTransactionRequest({
     // value: "12000000000000000000",
@@ -402,6 +479,7 @@ const [amount,setAmount] = useState();
     }),
     to: walletClient.account.address,
   })
+   
   //console.log("This si transaction prepared",JSON.stringify(transactionPrepared))
 
   const serializedData = JSON.stringify(transactionPrepared, (key, value) =>
@@ -413,7 +491,7 @@ const [amount,setAmount] = useState();
   const signedTransactionPrepared = await walletClient.signTransaction(transactionPrepared);
 
   console.log("This signed transaction prepared",JSON.stringify(signedTransactionPrepared));
-
+ /*
 
   //Backend Call
 
@@ -449,12 +527,11 @@ if (response.ok) {
 console.error("Error:", error);
 alert("An error occurred while submitting the form.");
 }
-
+*/
 };
 
   const handleAmountChange=(e)=>{
     setAmount(e.target.value);
-    console.log(amount);
   }
   return (<div className="App-header">
     <h2 > Transfer Page</h2>
@@ -465,8 +542,8 @@ alert("An error occurred while submitting the form.");
       <input
         type="tel"
         placeholder="Enter Receiver's mobile number"
-        value={mobileNumber}
-        onChange={handleMobileNumberChange}
+        value={receiverMobileNumber}
+        onChange={handleReceiverMobileNumberChange}
         style={{ padding: "8px", fontSize: "14px" }}
       />
 
@@ -476,6 +553,14 @@ alert("An error occurred while submitting the form.");
         placeholder="Amount "
         value={amount}
         onChange={handleAmountChange}
+        style={{ padding: "8px", fontSize: "14px" }}
+      />
+   <p>Set password</p>
+      <input
+        type="text"
+        placeholder="Set password"
+        value={password}
+        onChange={handlePassword}
         style={{ padding: "8px", fontSize: "14px" }}
       />
 
