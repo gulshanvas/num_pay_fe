@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import Cookies from 'universal-cookie';
 import { odysseyTestnet } from 'viem/chains';
 import { eip7702Actions } from 'viem/experimental';
-import { createPublicClient, createWalletClient, encodeFunctionData, http, parseEther } from 'viem';
+import { createPublicClient, createWalletClient, encodeFunctionData, formatEther, http, parseEther } from 'viem';
 import { privateKeyToAccount } from "viem/accounts";
 import { BASE_URL } from "./constants";
 // eslint-disable-next-line no-undef
@@ -334,7 +334,82 @@ const TransferPage = () => {
   const [receiverMobileNumber, setReceiverMobileNumber] = useState("");
 const [amount,setAmount] = useState();
 const [password,setPassword] = useState();
+const [message, setMessage] = useState(""); 
+const [txHash, setTxHash] = useState(null); // To store transaction hash
+const [blockNumber, setBlockNumber] = useState(null); // To store block number
+const [balance, setBalance] = useState(); // Set balance dynamically based on your logic
 
+useEffect(() => {
+  // Simulate fetching balance (replace with actual API/blockchain call)
+  const fetchBalance = async () => {
+    const userBalance = "1000"; 
+    
+    let APIResponse;
+let instantUserBalance;
+    try {
+      
+    const cookies = new Cookies();
+    const mobile_number= cookies.get("mobileNumber");
+    console.log("Modile number in user",mobile_number)
+let getMobileResponse;
+let userPublicKey;
+    try {
+      const response = await fetch(
+        `${BASE_URL}/mobile/${mobile_number}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+         // body: JSON.stringify({}), // Add body content if needed, or leave empty
+        }
+      );
+
+      if (response.ok) {
+        getMobileResponse = await response.json();
+        console.log("This is data ",getMobileResponse)
+        userPublicKey= "0x"+getMobileResponse.data.publicKey;
+      } else {
+        console.error("Error:", response.statusText);
+      
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    if(!userPublicKey){return;}
+console.log("Retrived public key", userPublicKey)
+      const response = await fetch(
+        `${BASE_URL}/erc20_balance/${userPublicKey}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+         // body: JSON.stringify({}), // Add body content if needed, or leave empty
+        }
+      );
+
+      if (response.ok) {
+        APIResponse = await response.json();
+        console.log("This is api response ",APIResponse)
+          instantUserBalance = formatEther( APIResponse.data.balance);
+
+        console.log("This is instant user balance  ",instantUserBalance)
+        }
+        else {
+        console.error("Error:", response.statusText);
+      
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      
+    }
+
+    setBalance(instantUserBalance);
+  };
+
+  fetchBalance();
+}, []);
 const handlePassword=(e) =>{
   setPassword(e.target.value);
 }
@@ -347,10 +422,10 @@ const handlePassword=(e) =>{
 const handleDummySubmit = async()=>{
   console.log("This is receiver mobile number    ",receiverMobileNumber)
 }
-
+ 
   const handleSubmit = async() => {
     //API
-
+    
     console.log("This is the password  ",password);
     console.log("This is the amount  ",amount);
     const parsedAmount = parseEther(amount);
@@ -446,8 +521,8 @@ let APIResponse;
   }).extend(eip7702Actions())
 
  
-
-  const authorization = await walletClient.signAuthorization({ contractAddress, delegate: "0xbA1c4e29714F4618215441BC3e9629054857b529" });//TO DO=> Delegate address
+  
+const authorization = await walletClient.signAuthorization({ contractAddress, delegate: "0xbA1c4e29714F4618215441BC3e9629054857b529" });//TO DO=> Delegate address
 console.log("This is authorization list ",authorization)
   const tokenContract = "0xb9A3C6197b864B8d49Ef86894249B952Cbae1e34" //TO DO=> Token contract
   const receiverHexAddress = "0x"+receiverPublicKey;
@@ -486,10 +561,36 @@ const response = await fetch(
     body: JSON.stringify({}), // Add body content if needed, or leave empty
   }
 );
-
+let instantUserBalance;
 if (response.ok) {
   transferAPIResponse = await response.json();
   console.log("Success:", transferAPIResponse);
+
+  setTxHash(transferAPIResponse.data.transactionHash)
+  setBlockNumber(transferAPIResponse.data.blockNumber)
+  //Star6t
+
+  const erc20response = await fetch(
+    `${BASE_URL}/erc20_balance/${walletClient.account.address}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+     // body: JSON.stringify({}), // Add body content if needed, or leave empty
+    }
+  );
+  if (erc20response.ok) {
+    APIResponse = await erc20response.json();
+    console.log("This is api response ",APIResponse)
+      instantUserBalance = formatEther( APIResponse.data.balance);
+
+    console.log("This is instant user balance  ",instantUserBalance)
+    }
+
+    setBalance(instantUserBalance);
+
+  //end
 } else {
   console.error("Error:", response.statusText);
 }
@@ -587,7 +688,7 @@ alert("An error occurred while submitting the form.");
       backgroundColor: "#f4f4f4", /* Optional: Background color for contrast */
     }}>
   <div className="App-header" style ={{ 
-    width: "50%",
+    width: "100%",
     backgroundColor: "blueviolet",
     color: "white",
     fontSize: "24px",
@@ -614,6 +715,12 @@ alert("An error occurred while submitting the form.");
         onChange={handleAmountChange}
         style={{ padding: "8px", fontSize: "14px" }}
       />
+
+<p>
+            <strong>Balance:</strong> {balance}
+          </p>
+
+
    <p>Set password:</p>
       <input
         type="password"
@@ -624,7 +731,8 @@ alert("An error occurred while submitting the form.");
       />
 
 <button
-        onClick={handleSubmit}
+        onClick={handleSubmit
+        }
         style={{
           padding: "9px 17px",
           backgroundColor: "orange",
@@ -638,6 +746,28 @@ alert("An error occurred while submitting the form.");
       >
         Submit
       </button>
+      {message}{" "}
+            {txHash && blockNumber && (
+              <>
+                <a
+                  href={`https://odyssey-explorer.ithaca.xyz/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "orange" }}
+                >
+                  {txHash}
+                </a>{" "}
+                is Transaction Hash in block number{" "}
+                <a
+                  href={`https://odyssey-explorer.ithaca.xyz/block/${blockNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "orange" }}
+                >
+                  {blockNumber}
+                </a>
+              </>
+            )}
   
     </div>
     </div>
