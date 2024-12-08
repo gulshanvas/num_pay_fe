@@ -701,7 +701,7 @@ alert("An error occurred while submitting the form.");
       <p>Enter Receiver's Mobile Number:</p>
       <input
         type="tel"
-        placeholder="Enter Receiver's mobile number"
+        placeholder="Enter Receiver's mobile number with country code"
         value={receiverMobileNumber}
         onChange={handleReceiverMobileNumberChange}
         style={{ padding: "8px", fontSize: "14px" }}

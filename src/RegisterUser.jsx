@@ -146,7 +146,7 @@ console.error("Error:", error);
       <p>Enter Mobile Number:</p>
       <input
         type="tel"
-        placeholder="Enter mobile number"
+        placeholder="Enter mobile number with country code"
         value={mobileNumber}
         onChange={handleMobileNumberChange}
         style={{ padding: "8px", fontSize: "14px" }}
