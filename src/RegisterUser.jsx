@@ -141,7 +141,7 @@ console.error("Error:", error);
       fontWeight: "bold",
       borderRadius: "40%",
     }}>
-        <div className="App-header" style={{  alignItems: "center", gap: "10px", display:"grid" }}>
+        <div  style={{  alignItems: "center", gap: "10px", display:"grid" }}>
       {/* Mobile Number Input */}
       <p>Enter Mobile Number:</p>
       <input
@@ -156,7 +156,7 @@ console.error("Error:", error);
         onClick={handleSendOTP}
         style={{
           padding: "10px 20px",
-          backgroundColor: "#007BFF",
+          backgroundColor: "orange",
           color: "#fff",
           border: "none",
           borderRadius: "4px",
@@ -198,7 +198,7 @@ console.error("Error:", error);
         onClick={handleSubmit}
         style={{
           padding: "10px 20px",
-          backgroundColor: "#007BFF",
+          backgroundColor: "orange",
           color: "#fff",
           border: "none",
           borderRadius: "4px",
