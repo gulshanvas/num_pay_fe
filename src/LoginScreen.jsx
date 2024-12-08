@@ -160,7 +160,7 @@ console.log("This is OTP  ",otp)
       <p>Enter Mobile Number:</p>
       <input
         type="tel"
-        placeholder="Enter mobile number with country code"
+        placeholder="Mobile number with country code"
         value={mobileNumber}
         onChange={handleMobileNumberChange}
         style={{ padding: "8px", fontSize: "14px" }}
